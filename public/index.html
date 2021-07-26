@@ -7,62 +7,45 @@
     <title>Google Signin</title>
    <!-- Meta atgs siempre se van en el headers --> 
    <meta name="google-signin-client_id" content="527330617148-1u7882i81rpq0lnrahk16maik0lh8uj1.apps.googleusercontent.com">
-</head>
-<body>
-    
-    <h1>Google Signin</h1>
-    <hr>
-    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
-    <a href="#" onclick="signOut();">Sign out</a>
+</head>
+<body class="container">
+
+   <div class="row mt-5">
+      <div class="col-sm-6">
+          <h1>Google Signin</h1>
+          <hr>
+          <br>
+          <div class="g-signin2" data-onsuccess="onSignIn"></div>
+          <br>
+          <a href="#" onclick="signOut();">Sign out</a>
+      </div>
+
+      <div class="col-sm-6">
+         <h1>Login manual</h1>
+         <hr>
+
+         <form class="d-grid">
+             <input type="text" name="correo" class="form-control mb-2" placeholder="Correo" />
+             <input type="text" name="password" class="form-control mb-2" placeholder="Password" />
+ 
+             <button type="submit" class="btn btn-primary">
+                 Ingresar
+             </button>
+         </form>
+
+     </div>
+    
+   </div>
+    
 
  <!-- usualmente los scripts se cargan al final del body en este caso da igual porque se cargan de forma asycrona  -->
- <script src="https://apis.google.com/js/platform.js" async defer></script>
+ <script src="https://apis.google.com/js/platform.js" async defer></script> 
  
- <script>
-    // como voy a estar desplegando y en mismo tiempo trabajando en loacal . voy a tarbajar con ternario captar en que url me en cuetro
-    // console.log(window.location.hostname.includes('localhost'))
-    var url = ( window.location.hostname.includes('localhost') )
-                    ? 'http://localhost:8089/api/auth/google'
-                    : 'https://marocmaroc.herokuapp.com/api/auth/google'; 
+ <!-- La logica de autenticacion por token_id de google  -->
+ <script src="./js/auth.js"></script>
 
-
-    function onSignIn(googleUser) {
-
-        var profile = googleUser.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-
-
-        var id_token = googleUser.getAuthResponse().id_token;
-        // meter el token que es string en un objeto literal . la data tiene que estar en el formato que yo esperaba .
-        const data = { id_token };
-        console.log('aquiiiiiii',id_token )
-
-        // peticion al back-end - disparo fech , no hay que importar nada porque viene en los navigadores modernos .
-        fetch( url, {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' }, // estoy esperando en RestServer que la data viene en formato Json , asi en los header de la peticion post ...
-           body: JSON.stringify( data ) // el body en una application/json tiene que ir serializado como un json 
-        })
-        .then( resp => resp.json() ) // porque la respuesta tambien tengo que serializarla .
-        .then( data => console.log( 'Nuestro server', data ) ) // totalmento puedo enacadenar , asi el returno de primer then esta recibido en data .
-        .catch( console.log );
-
-
-    }   
-
-    function signOut() {
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
-        console.log('User signed out.');
-      }); 
-    }
-
-
-
- </script>
+ 
 </body>
 </html>

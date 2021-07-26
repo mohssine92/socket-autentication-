@@ -1,0 +1,2 @@
+* en modelos tengo modelos de monggos
+* modelo chat el que va ser controlado en el controller de socket : controlador basado en eventos : donde puede llamar funciones de helpers que encargan de instanciar modelos de mongos para  validar contra db o registrar 

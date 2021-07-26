@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const Usuario = require('../models/usuario');
 
 
 // usado en el constroller de autenticacion , En cada autenticacion se genera JWT 
@@ -27,8 +28,41 @@ const generarJWT = ( uid = '' ) => {
 
 
 
+/* la idea en el controler de mi sockets , cuando un cliente se conecta debo validar su token recibido para la Obtencion del objeto user connectado
+ * esta usa esta funcion como validacion 
+*/
+const comprobarJWT = async( token = '') => {
+
+    try {
+        
+        if(  token.length < 10 ) {
+            return null; // en este caso segnificaria no viene un token , viene otra cosqa rara
+        }
+
+        const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY ); // verificar token contra nuestro firma  : desincriptarlo
+        const usuario = await Usuario.findById( uid ); // obtengo id puedo - solicito objeto del user
+
+        if ( usuario ) {
+            if ( usuario.estado ) { // true en esta implenetacion de REstSErver segnifica user existe no fue borrado o desactivado la cuenta
+                return usuario;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+
+    } catch (error) {
+        return null;
+    }
+
+}
+
+
+
 
 module.exports = {
-    generarJWT
+    generarJWT,
+    comprobarJWT
 }
 

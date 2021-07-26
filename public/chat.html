@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>----</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <meta name="google-signin-client_id" content="527330617148-1u7882i81rpq0lnrahk16maik0lh8uj1.apps.googleusercontent.com">
+
+</head>
+<body class="container">
+
+    <div class="row mt-5">
+
+        <div class="col-sm-6">
+            <h3>Enviar mensaje</h3>
+            <hr>
+            <input type="text"
+                   id="txtUid"
+                   class="form-control mb-2"
+                   placeholder="uid"
+                   autocomplete="off">
+
+            <input type="text"
+                   id="txtMensaje"
+                   class="form-control mb-2"
+                   placeholder="Mensaje"
+                   autocomplete="off">
+
+            <h3>Usuarios</h3>
+            <hr>
+            <ul id="ulUsuarios">
+              <!-- mostracion de todos ususarios activos -->
+            </ul>
+        </div>
+
+
+        <div class="col-sm-6">
+            <h3>Chat completo</h3> <!-- todos ultimos 10 mesajes de chat :podemos guardar en db : -->
+            <hr>
+            <ul id="ulMensajes">
+               <!-- mostracion de todos mensajes propiamente  -->
+            </ul>
+
+
+        </div>
+
+
+    </div>
+
+
+    <button id="btnSalir" class="btn btn-outline-danger">
+        Logout
+    </button>
+
+
+    <script src="https://apis.google.com/js/platform.js"></script>
+
+    <!-- libreria seria el mismo socket client  !! cargada del package !! de aqui ectarigo la funcion io() etc ... -->
+    <script src="./socket.io/socket.io.js"></script>
+    <!-- js/chat es donde  implemenatmos funciones etc .. extaredos de libreria del /socket.io/.. para la conexion y comunicacion con el server de sockets : backend -->
+    <script src="./js/chat.js"></script>
+</body>
+</html>

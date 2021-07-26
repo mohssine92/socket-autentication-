@@ -2,14 +2,9 @@ const { Router }= require('express');
 const { check } = require('express-validator');
 
 // Controller Funcion 
-const { login, googleSignin } = require('../controllers/auth');
+const { login, googleSignin, renovarToken } = require('../controllers/auth');
 
-const { validarCampos } = require('../middlewares/validar-campos');
-
-
-
-
-
+const { validarCampos , validarJWT } = require('../middlewares');
 
 
 
@@ -31,6 +26,12 @@ router.post('/google',[
    check('id_token', 'El id_token es necesario').not().isEmpty(), 
    validarCampos
 ], googleSignin );
+
+
+/* valida JWT - y traer informacion del user - lo uso en chat o cualquier otra pagina requiere verificacion de la perzona autenticada que tenemos su Token en lovlstorage 
+ * 2 arg , valifacion , 3 arg controller
+*/
+router.get('/', validarJWT , renovarToken );
 
 
 

@@ -1,8 +1,11 @@
 const express = require('express')
 var cors = require('cors');
 const fileUpload = require('express-fileupload');
+const { createServer } = require('http');
+
 
 const { dbConnection } = require('../db/config');
+const { socketController } = require('../sockets/controller');
 
 
 
@@ -12,32 +15,42 @@ const { dbConnection } = require('../db/config');
 class Server {
 
 
-  //es inecesario declarar la props , basta declaralos en el constructor
+  // basta declarar las props en el constructor .
    constructor(){
-     // express() es la funcion servidor
-     this.app = express();   
+   
+     this.app = express();  // es la applicacion de express
      this.port = process.env.PORT;
+     this.server = createServer( this.app ); // Mi servidor preparado para express y sockets server
+     this.io     = require('socket.io')( this.server ) // mi servidor de socket 
 
-    /* Definir urls ApiRest en el servidor de node , sino la defino no estara reconocida por mi servidore 
-       cada ruta dispone de endpoints propios = archivos de routes , la suma de todos seria los endPoints de RestApi */
-    this.paths = {
-      auth:       '/api/auth',
-      buscar:     '/api/buscar',
-      categorias: '/api/categorias',
-      productos:  '/api/productos',
-      usuarios:   '/api/users',
-      uploads:    '/api/uploads',
-    }
+
+
+
+
+      /* Definir urls ApiRest en el servidor de node , sino la defino no estara reconocida por mi servidore 
+      ada ruta dispone de endpoints propios = archivos de routes , la suma de todos seria los endPoints de RestApi */
+      this.paths = {
+       auth:       '/api/auth',
+       buscar:     '/api/buscar',
+       categorias: '/api/categorias',
+       productos:  '/api/productos',
+       usuarios:   '/api/users',
+       uploads:    '/api/uploads',
+     }
   
      
-     // Conectar a db atlass en nube , es um metodo , se ejecuta antes de lod middelware
-     this.connectarDB();
+    // Conectar a db atlass en nube , es um metodo , se ejecuta antes de los middelware
+    this.connectarDB();
 
     // Middelwares : funciones a nivel del servidor de express  : se ejecutan antes de llegar a las rutas
-     this.middlewares();
+    this.middlewares();
 
     // Rutas de mi aplicacion 
-     this.routes();
+    this.routes();
+
+    // Necesito estar escuchando eventos propiamente de los sockets
+    this.sockets();
+
 
    }
 
@@ -48,9 +61,10 @@ class Server {
 
    /* aqui tenemos agrupados lo que son mdlrs a nivel de servidor */
    middlewares(){
-     // app.use() es los middelware de express ver mas informacion en la doc de express ..
-     // Cors , donde configuramos las cabezeras como los origines que tiene permioso a comunicar a los end-points del Restserver , 
-     // Rest-server pude ser publica , o solo para algunosorigenes ...hay varios escenarios que pudede configura
+     /*  app.use() es los middelware de express ver mas informacion en la doc de express ..
+      *  Cors , donde configuramos las cabezeras como los origines que tiene permisos a comunicar a los end-points del Restserver , 
+      *  Rest-server pude ser publica , o solo para algunos origenes ...hay varios escenarios que pudede configurar 
+     */
      this.app.use( cors() );
 
      /* Lectura y parseo del body disparado por Origen o navigador o postman por cliente  hacia todos nuestros end-points en esta configuracion 
@@ -76,7 +90,7 @@ class Server {
    } 
 
    routes() { 
-     /* middelware de express , segun this.paths entrante se require  el archivo de rutas : verbos http relacionado */
+    /* middelware de express , segun this.paths entrante se require  el archivo de rutas : verbos http relacionado */
     this.app.use( this.paths.usuarios, require('../routes/users'));
     this.app.use( this.paths.buscar, require('../routes/buscar'));
     this.app.use( this.paths.auth, require('../routes/auth'));
@@ -87,12 +101,21 @@ class Server {
 
    }
 
-   listen() {
-     this.app.listen(this.port, () => {
+   // lo que vamos a hacer aqua : es una configuracion , para separar toda la logica del manejo de mis sockets  
+   // 'connection' es un evento propio del server socket , on : es funcion para escuchar event
+   // pasar la definicon : no ejecutar sincro , como hemos visto en angular , la solucion es ejecutar funcion dentro de otra cuando tenemos que pasar args como es el caso de : socket , this.io
+   sockets() {
+    this.io.on('connection', ( socket ) => socketController( socket , this.io) );     
+
+   }
+
+   listen() { // Recuerda en este caso no vamos a escuchar server de express , porque no tiene nada de sockets
+     this.server.listen( this.port, () => {
         console.log(`Example app listening at http://localhost:${this.port}`)
      })
 
    }
+
 }
 
 

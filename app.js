@@ -1,6 +1,8 @@
 // Variables de entorno
 require('dotenv').config();
 
+
+// modelo de mi servider de back-end
 const Server = require('./models/server');
 
 
